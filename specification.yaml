@@ -1,0 +1,54 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: Pastebin
+  description: A simple pastebin service
+  version: "1.0.0"
+  
+host: localhost:8000
+schemes:
+  - http
+
+produces:
+  - text/plain; charset=utf-8
+
+paths:
+  /:
+    post:
+      consumes: 
+        - text/plain; charset=utf-8
+      summary: Create Post
+      parameters:
+        - name: body
+          in: body
+          description: Post body
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Post created successfully
+          schema:
+            type: string
+            format: uuid
+            description: Post ID
+  /{post_id}:
+    get:
+      summary: Post
+      parameters:
+      - name: post_id
+        in: path
+        description: Post ID
+        type: string
+        format: uuid
+        required: true
+      responses:
+        200:
+          description: Post
+          schema:
+            type: string
+            description: Post body
+        404:
+          description: Post not found
+            
