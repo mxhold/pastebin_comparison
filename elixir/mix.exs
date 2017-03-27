@@ -15,7 +15,7 @@ defmodule Pastebin.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [:logger, :sqlite_ecto, :ecto, :cowboy, :plug],
+      applications: [:logger, :cowboy, :plug],
       mod: {Pastebin, []},
     ]
   end
@@ -33,8 +33,8 @@ defmodule Pastebin.Mixfile do
     [
       {:cowboy, "~> 1.0.0"},
       {:plug, "~> 1.0"},
-      {:sqlite_ecto, "~> 1.0.0"},
-      {:ecto, "~> 1.0"},
+      {:sqlitex, "~> 1.0"},
+      { :uuid, "~> 1.1" },
     ]
   end
 end

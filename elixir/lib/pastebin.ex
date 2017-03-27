@@ -5,8 +5,8 @@ defmodule Pastebin do
     import Supervisor.Spec, warn: false
 
     children = [
-      supervisor(Pastebin.Repo, []),
-      worker(__MODULE__, [], function: :run)
+      worker(Sqlitex.Server, ['db.sqlite3', [name: Sqlitex.Server]]),
+      worker(__MODULE__, [], function: :run),
     ]
 
     opts = [strategy: :one_for_one, name: Pastebin.Supervisor]
@@ -14,39 +14,17 @@ defmodule Pastebin do
   end
 
   def run do
-    {:ok, _} = Plug.Adapters.Cowboy.http Pastebin.AppRouter, []
-  end
+    sql = "CREATE TABLE IF NOT EXISTS posts (id TEXT, body BLOB)"
+    Sqlitex.Server.query(Sqlitex.Server, sql)
 
-  defmodule Repo do
-    use Ecto.Repo, otp_app: :pastebin, adapter: Sqlite.Ecto
-  end
-
-  defmodule Post do
-    use Ecto.Schema
-
-    @primary_key false
-
-    schema "posts" do
-      field :id
-      field :body
+    port = case System.get_env("PORT") do
+      nil -> raise "PORT environment variable must be set"
+      port -> String.to_integer(port)
     end
 
-    def insert(body: body) do
-      Repo.insert(%Post{body: body})
-    end
+    IO.puts "Starting server on port #{port}..."
 
-    def fetch(id) do
-      with {:ok, id} <- Ecto.UUID.cast(id),
-           {:ok, post} <- do_fetch(id),
-           do: {:ok, post}
-    end
-
-    defp do_fetch(id) do
-      case Repo.get(__MODULE__, id) do
-        nil -> :error
-        post -> {:ok, post}
-      end
-    end
+    {:ok, _} = Plug.Adapters.Cowboy.http Pastebin.AppRouter, [], port: port
   end
 
   defmodule AppRouter do
@@ -57,17 +35,25 @@ defmodule Pastebin do
 
     post "/" do
       {:ok, body, _} = Plug.Conn.read_body(conn)
-      {:ok, post} = Post.insert(body: body)
-      send_resp(conn, 201, post.id)
+      post_id = UUID.uuid4()
+
+      sql = "INSERT INTO posts (id, body) VALUES ($1, $2)"
+      Sqlitex.Server.query(Sqlitex.Server, sql, bind: [post_id, body])
+
+      conn
+      |> put_resp_content_type("text/plain")
+      |> send_resp(201, post_id)
     end
 
     match "/:post_id" do
-      case Post.fetch(post_id) do
-        {:ok, post} ->
+      sql = "SELECT body FROM posts WHERE id = $1"
+      {:ok, rows} = Sqlitex.Server.query(Sqlitex.Server, sql, bind: [post_id])
+      case rows do
+        [] -> not_found(conn)
+        [[{:body, body}]] ->
           conn
           |> put_resp_content_type("text/plain")
-          |> send_resp(200, post.body)
-        :error -> not_found(conn)
+          |> send_resp(200, body)
       end
     end
 
@@ -76,7 +62,9 @@ defmodule Pastebin do
     end
 
     def not_found(conn) do
-      send_resp(conn, 404, "404")
+      conn
+      |> put_resp_content_type("text/plain")
+      |> send_resp(404, "Not found\n")
     end
   end
 end
