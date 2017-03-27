@@ -1,1 +1,3 @@
 *.sqlite3
+elixir/deps/
+elixir/_build/
