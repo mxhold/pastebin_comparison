@@ -36,3 +36,13 @@ Run the Ruby server:
 Run the Ruby tests:
 
     make test_ruby
+
+
+# TODO
+index
+
+concision
+error messages
+error handling
+fault tolerance
+performance

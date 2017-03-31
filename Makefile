@@ -1,6 +1,6 @@
 PORT := 3000
 
-.PHONY: prereqs ruby elixir test
+.PHONY: prereqs ruby elixir test perf
 
 prereqs:
 	echo TODO
@@ -13,3 +13,6 @@ elixir:
 
 test:
 	PORT=$(PORT) bundle exec rspec spec --format=doc
+
+perf:
+	echo TODO
