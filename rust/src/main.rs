@@ -59,6 +59,8 @@ fn main() {
     let conn = pool.get().unwrap();
     let sql = "CREATE TABLE IF NOT EXISTS posts (id TEXT, body BLOB)";
     conn.execute(sql, &[]).unwrap();
+    let sql = "CREATE UNIQUE INDEX IF NOT EXISTS posts_id ON posts (id)";
+    conn.execute(sql, &[]).unwrap();
 
     let mut middleware = Chain::new(router);
     middleware.link_before(persistent::Read::<ConnectionPool>::one(pool));

@@ -6,6 +6,7 @@ configure do
   database_file = "db.sqlite3"
   db = SQLite3::Database.new(database_file)
   db.execute("CREATE TABLE IF NOT EXISTS posts (id TEXT, body BLOB)")
+  db.execute("CREATE UNIQUE INDEX IF NOT EXISTS posts_id ON posts (id)")
   set(:db, db)
 end
 

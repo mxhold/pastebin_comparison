@@ -1,0 +1,27 @@
+#!/bin/bash
+
+function check_for_version {
+  echo -n "Checking for $1..."
+
+  command -v $2 >/dev/null 2>&1 || { echo "FAILED"; exit 1; }
+
+  version=$($2)
+  required_version=$3
+
+  if [[ "$version" =~ $required_version ]]; then
+    echo "OK"
+  else
+    echo "FAILED"
+    echo "Detected $1 version: $version"
+    echo "Required $1 pattern: $required_version"
+    exit 1
+  fi
+}
+
+check_for_version "Ruby" "ruby -v" "ruby 2\.[^0]"
+check_for_version "Bundler" "bundle -v" "version 1*"
+check_for_version "Elixir" "elixir --version | tail -1" "Elixir 1"
+check_for_version "Rust" "rustc --version" "rustc 1"
+
+echo "Success!"
+exit 0

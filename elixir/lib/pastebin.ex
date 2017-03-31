@@ -17,6 +17,9 @@ defmodule Pastebin do
     sql = "CREATE TABLE IF NOT EXISTS posts (id TEXT, body BLOB)"
     Sqlitex.Server.query(Sqlitex.Server, sql)
 
+    sql = "CREATE UNIQUE INDEX IF NOT EXISTS posts_id ON posts (id)"
+    Sqlitex.Server.query(Sqlitex.Server, sql)
+
     port = case System.get_env("PORT") do
       nil -> raise "PORT environment variable must be set"
       port -> String.to_integer(port)

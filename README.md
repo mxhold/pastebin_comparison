@@ -21,25 +21,52 @@ To make the comparison easiest and for minimal setup, all are implemented using 
 
 ## Prerequisites
 
-- Install Ruby with Bundler
+- Ruby >= 2.1
+- Bundler >= 1
+- Elixir >= 1
+- Rust >= 1
+
+To check if you have all the prereqs, run `make prereqs`.
 
 ## Getting Started
 
-Setup Ruby server (only need to do this once):
+Setup everything:
 
-    make ruby
+    make
 
 Run the Ruby server:
 
-    make run_ruby
+    make ruby
 
-Run the Ruby tests:
+Run the Elixir server:
 
-    make test_ruby
+    make elixir
+
+Run the Rust server:
+
+    make rust
+
+These will all run on port 3000 by default. To override, set the PORT like:
+
+    make PORT=3001 ruby
+
+To run the test suite:
+
+    make test
+
+This will test the server running on port 3000 by default. To override:
+
+    make PORT=3001 test
+
+To run the performance benchmark, in separate terminals run:
+
+    make PORT=3000 ruby
+    make PORT=3001 elixir
+    make PORT=3002 rust
+    make perf
 
 
 # TODO
-index
 
 concision
 error messages

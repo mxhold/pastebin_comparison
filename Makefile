@@ -1,15 +1,15 @@
 PORT := 3000
 
-.PHONY: prereqs ruby elixir rust test perf
+.PHONY: prereqs setup ruby elixir rust test perf
 
-setup:
+setup: prereqs
 	bundle install
 	cd ruby/ && bundle install
 	cd elixir/ && mix deps.get
 	cd rust/ && cargo build
 
 prereqs:
-	echo TODO
+	./prereqs
 
 ruby:
 	cd ruby/ && bundle exec ruby app.rb -p $(PORT)
@@ -24,4 +24,4 @@ test:
 	PORT=$(PORT) bundle exec rspec spec --format=doc
 
 perf:
-	echo TODO
+	bundle exec ruby perf.rb
