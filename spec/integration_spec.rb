@@ -5,7 +5,7 @@ UUID_PATTERN = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z
 
 RSpec.describe "Integration test" do
   let(:uri) do
-    URI::HTTP.build(host: "localhost", port: ENV.fetch("PORT"))
+    URI::HTTP.build(host: "localhost", port: ENV.fetch("PORT").to_i)
   end
 
   describe "POST /" do
