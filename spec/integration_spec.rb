@@ -1,11 +1,15 @@
 require "net/http"
 require "open3"
 require "irb"
-UUID_PATTERN = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/
+UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/
 
 RSpec.describe "Integration test" do
+  let(:port) do
+    ENV.fetch("PORT").to_i
+  end
+
   let(:uri) do
-    URI::HTTP.build(host: "localhost", port: ENV.fetch("PORT").to_i)
+    URI::HTTP.build(host: "localhost", port: port)
   end
 
   describe "POST /" do
@@ -20,8 +24,8 @@ RSpec.describe "Integration test" do
 
         expect(response.code).to eql "201"
         expect(response["Content-Type"]).to eql "text/plain; charset=utf-8"
-        post_id = response.body
-        expect(post_id).to match(UUID_PATTERN)
+
+        expect(response.body).to match(/\Ahttp:\/\/localhost:#{port}\/#{UUID_PATTERN}\z/)
       end
     end
   end
@@ -35,10 +39,8 @@ RSpec.describe "Integration test" do
           request.body = "Hello, world!\n"
           request.content_type = "text/plain; charset=utf-8"
           response = http.request(request)
-          post_id = response.body
 
-          uri.path = "/#{post_id}"
-          request = Net::HTTP::Get.new(uri)
+          request = Net::HTTP::Get.new(URI(response.body))
 
           response = http.request(request)
 

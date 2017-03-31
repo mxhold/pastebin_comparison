@@ -43,9 +43,12 @@ defmodule Pastebin do
       sql = "INSERT INTO posts (id, body) VALUES ($1, $2)"
       Sqlitex.Server.query(Sqlitex.Server, sql, bind: [post_id, body])
 
+      port_part = if conn.port == 80 do "" else ":#{conn.port}" end
+      base_url = "#{conn.scheme}://#{conn.host}#{port_part}"
+
       conn
       |> put_resp_content_type("text/plain")
-      |> send_resp(201, post_id)
+      |> send_resp(201, "#{base_url}/#{post_id}")
     end
 
     match "/:post_id" do

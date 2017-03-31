@@ -22,7 +22,7 @@ post "/" do
   content_type "text/plain; charset=utf-8"
   status 201
 
-  post_id
+  "#{request.base_url}/#{post_id}"
 end
 
 get "/:post_id" do

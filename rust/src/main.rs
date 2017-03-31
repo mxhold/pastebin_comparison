@@ -29,8 +29,10 @@ fn post_pastebin(req: &mut Request) -> IronResult<Response> {
     let id = uuid::Uuid::new_v4().to_string();
     let sql = "INSERT INTO posts VALUES ($1, $2)";
 
+    let response_body = format!("{}{}", req.url, id);
+
     match conn.execute(sql, &[&id, &req_body]) {
-        Ok(_) => Ok(Response::with((status::Created, Header(ContentType::plaintext()), id))),
+        Ok(_) => Ok(Response::with((status::Created, Header(ContentType::plaintext()), response_body))),
         Err(_) => Ok(Response::with((status::ServiceUnavailable, Header(ContentType::plaintext()), ""))),
     }
 }
